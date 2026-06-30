@@ -1,0 +1,20 @@
+{
+  "MLECS_AUC_ROC": 0.8052,
+  "MLECS_AUC_PR": 0.6692,
+  "MLECS_KS_Stat": 0.4667,
+  "MLECS_Brier_Score": 0.1573,
+  "MLECS_F1_Score": 0.5962,
+  "Baseline_LR_AUC": 0.7368,
+  "Baseline_RF_AUC": 0.8064,
+  "Baseline_XGBoost_AUC": 0.7639,
+  "Baseline_LightGBM_AUC": 0.7821,
+  "Baseline_CatBoost_AUC": 0.8292,
+  "Baseline_AvgEnsemble_AUC": 0.7971,
+  "ECS_RankCorrelation": 0.7464,
+  "ECS_SignAgreement": 0.8084,
+  "ECS_TopK_Overlap": 0.5055,
+  "ECS_Overall": 0.6927,
+  "Faithfulness_SHAP": 0.2773,
+  "Faithfulness_Random": 0.0677,
+  "Faithfulness_Ratio": 4.09
+}

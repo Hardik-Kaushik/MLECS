@@ -1,0 +1,14 @@
+# Build/working directory (not for GitHub)
+research_paper/
+
+# CatBoost training cache
+catboost_info/
+
+# Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+Thumbs.db

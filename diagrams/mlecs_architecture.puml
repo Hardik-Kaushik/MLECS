@@ -1,0 +1,115 @@
+@startuml MLECS_Architecture
+
+' === LAYOUT ===
+top to bottom direction
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 12
+skinparam rectangleBorderThickness 1.5
+skinparam packageBorderThickness 2
+skinparam arrowThickness 2
+skinparam arrowColor #2C3E50
+skinparam packageFontSize 13
+skinparam packageFontStyle bold
+skinparam rectangleRoundCorner 10
+
+' ============================================================
+' TITLE
+' ============================================================
+title <size:18><b>MLECS Framework Architecture</b></size>\n<size:12>Multi-Level Explainable Credit Scoring System</size>
+
+' ============================================================
+' MODULE 1
+' ============================================================
+package "MODULE 1: DATA PREPROCESSING" as M1 <<Frame>> #E8F5E9/FFFFFF {
+
+    together {
+        rectangle "**LendingClub**\n2.26M rows\n(CSV)" as DS1 #BBDEFB
+        rectangle "**German Credit**\n1,000 rows\n(UCI)" as DS2 #BBDEFB
+        rectangle "**Home Credit**\n307K rows\n(Kaggle)" as DS3 #BBDEFB
+    }
+
+    rectangle "MICE Iterative Imputation" as STEP1 #C8E6C9
+    rectangle "Target Encoding (5-fold CV)" as STEP2 #C8E6C9
+    rectangle "Robust Scaling (Median/IQR)" as STEP3 #C8E6C9
+    rectangle "SMOTE-ENN Class Balancing" as STEP4 #C8E6C9
+    rectangle "Stratified Train/Test Split (80/20)" as STEP5 #C8E6C9
+
+    DS1 --> STEP1
+    DS2 --> STEP1
+    DS3 --> STEP1
+    STEP1 --> STEP2
+    STEP2 --> STEP3
+    STEP3 --> STEP4
+    STEP4 --> STEP5
+}
+
+' ============================================================
+' MODULE 2
+' ============================================================
+package "MODULE 2: STACKING ENSEMBLE PREDICTION (SEP)" as M2 <<Frame>> #FFF8E1/FFFFFF {
+
+    together {
+        rectangle "**XGBoost**\nL1/L2 Regularization\ndepth=5, trees=500" as XGB #FFECB3
+        rectangle "**LightGBM**\nLeaf-wise Growth\nleaves=31, trees=500" as LGBM #FFECB3
+        rectangle "**CatBoost**\nOrdered Target Enc.\ndepth=6, iter=500" as CAT #FFECB3
+    }
+
+    rectangle "5-Fold Out-of-Fold Predictions" as OOF #FFF3E0
+
+    rectangle "<b>META-LEARNER</b>\n(Logistic Regression)\nP(default|x) = σ(w₁·f_XGB + w₂·f_LGBM + w₃·f_CAT + b)" as META #FFCDD2
+
+    XGB --> OOF
+    LGBM --> OOF
+    CAT --> OOF
+    OOF --> META
+}
+
+' ============================================================
+' MODULE 3
+' ============================================================
+package "MODULE 3: MULTI-LEVEL EXPLANATION (MLE)" as M3 <<Frame>> #E3F2FD/FFFFFF {
+
+    together {
+        rectangle "**LEVEL 1: GLOBAL**\n\n• SHAP Summary\n• Feature Importance\n• Dependence Plots\n• Population-wide" as L1 #BBDEFB
+        rectangle "**LEVEL 2: LOCAL**\n\n• SHAP Waterfall\n• LIME Surrogate\n• Dual Validation\n• Instance-level" as L2 #BBDEFB
+        rectangle "**LEVEL 3: COUNTERFACTUAL**\n\n• DiCE Generator\n• Feasibility Constraints\n• Actionable Recourse\n• Diverse Solutions" as L3 #BBDEFB
+    }
+}
+
+' ============================================================
+' MODULE 4
+' ============================================================
+package "MODULE 4: EXPLANATION CONSISTENCY EVALUATION (ECS)" as M4 <<Frame>> #F3E5F5/FFFFFF {
+
+    rectangle "**ECS = α·RankCorr(SHAP,LIME) + β·SignAgree(SHAP,LIME)\n+ γ·TopK_Overlap(SHAP,LIME,k)**" as FORMULA #E1BEE7
+
+    rectangle "Faithfulness Test | Stability Analysis\nPerturbation Correlation | Feature Removal" as METRICS #F8BBD0
+    
+    FORMULA --> METRICS
+}
+
+' ============================================================
+' OUTPUT
+' ============================================================
+rectangle "<b>OUTPUT</b>\nCredit Decision + Multi-Level Explanation Package" as OUT #ECEFF1
+
+' ============================================================
+' MODULE CONNECTIONS (vertical flow)
+' ============================================================
+STEP5 -down-> XGB : Feature\nMatrix
+STEP5 -down-> LGBM
+STEP5 -down-> CAT
+
+META -down-> L1 : Model\nAccess
+META -down-> L2
+META -down-> L3
+
+L1 -down-> FORMULA
+L2 -down-> FORMULA
+L3 -down-> FORMULA
+
+METRICS -down-> OUT
+
+@enduml

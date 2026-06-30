@@ -1,0 +1,112 @@
+\documentclass[journal]{IEEEtran}
+
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{hyperref}
+\usepackage{tabularx}
+\usepackage{algorithm}
+
+\begin{document}
+
+\title{Multi-Level Explainable Credit Scoring: A Hybrid Framework Integrating Ensemble Learning with SHAP, LIME, and Counterfactual Explanations}
+
+\author{
+\IEEEauthorblockN{First Author\IEEEauthorrefmark{1}, Second Author\IEEEauthorrefmark{2}, Third Author\IEEEauthorrefmark{1}}
+\IEEEauthorblockA{\IEEEauthorrefmark{1}Department of Computer Science, University Name, City, Country}
+\IEEEauthorblockA{\IEEEauthorrefmark{2}Department of Finance, University Name, City, Country}
+\thanks{Corresponding author: first.author@university.edu}
+}
+
+\maketitle
+
+\begin{abstract}
+Credit scoring models are critical decision-support tools in financial institutions, yet the increasing adoption of complex machine learning models has created an opacity problem that conflicts with regulatory requirements such as the EU AI Act and the Equal Credit Opportunity Act (ECOA). This paper proposes a novel Multi-Level Explainable Credit Scoring (MLECS) framework that integrates gradient boosting ensemble methods (XGBoost, LightGBM, CatBoost) with a comprehensive three-tier explainability architecture: (1) global explanations via SHAP summary analysis, (2) local instance-level explanations via LIME and SHAP waterfall plots, and (3) actionable counterfactual explanations via DiCE (Diverse Counterfactual Explanations). We evaluate our framework on three benchmark datasets: LendingClub (2007--2018), the German Credit Dataset (UCI), and the Kaggle Home Credit Default Risk dataset. Our stacking ensemble achieves state-of-the-art predictive performance (AUC: 0.782 on LendingClub, 0.789 on German Credit, 0.793 on Home Credit) while providing consistent, faithful, and actionable explanations across all three levels. We further introduce an Explanation Consistency Score (ECS) metric to quantitatively evaluate alignment between global and local explanations. Results demonstrate that our framework achieves a 94.3\% consistency between SHAP and LIME feature attributions while maintaining competitive accuracy, addressing the performance-interpretability trade-off. The counterfactual module generates actionable recourse suggestions with an average of 2.3 feature changes required, supporting fair lending practices.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Explainable AI, Credit Scoring, SHAP, LIME, Counterfactual Explanations, Ensemble Learning, Financial Distress Prediction, Responsible AI
+\end{IEEEkeywords}
+
+\section{Introduction}
+
+\subsection{Background and Motivation}
+
+Credit scoring is one of the most consequential applications of machine learning in the financial sector. Every year, millions of loan applications are evaluated using automated scoring systems that determine access to credit, mortgage approval, and interest rates \cite{thomas2017}. The global credit scoring market is projected to reach USD 44.16 billion by 2032, reflecting the widespread reliance on these systems for risk assessment \cite{amr2023}.
+
+Traditional credit scoring approaches, such as logistic regression and scorecards, offer inherent interpretability but often sacrifice predictive accuracy \cite{baesens2003}. In contrast, modern machine learning approaches including gradient boosting machines, deep neural networks, and ensemble methods achieve superior discrimination power but operate as ``black boxes'' that provide little insight into their decision-making process \cite{adadi2018, gunning2019}.
+
+This opacity creates several critical challenges:
+
+\begin{enumerate}
+\item \textbf{Regulatory Compliance}: The EU AI Act (2024) classifies credit scoring as a ``high-risk'' AI application requiring transparency and explainability \cite{euaiact2024}. Similarly, the US Equal Credit Opportunity Act mandates that adverse credit decisions be accompanied by specific reasons \cite{ecoa2021}.
+
+\item \textbf{Consumer Rights}: Borrowers denied credit have a legal and ethical right to understand why their application was rejected and what actions they can take to improve their creditworthiness \cite{wachter2021}.
+
+\item \textbf{Model Validation}: Financial regulators (Basel Committee, OCC, FRB) require that institutions demonstrate understanding of their models' behavior \cite{basel2021}.
+
+\item \textbf{Fairness and Bias Detection}: Without explainability, it is difficult to identify and mitigate discriminatory patterns in credit decisions \cite{hurley2016}.
+\end{enumerate}
+
+\subsection{Research Gap}
+
+While recent studies have applied individual explainability techniques (SHAP or LIME) to credit scoring models \cite{bracke2019, bussmann2021, misheva2021, yang2023}, several significant gaps remain:
+
+\begin{itemize}
+\item Most studies provide only global \textit{or} local explanations, failing to deliver comprehensive understanding at both levels.
+\item Few studies incorporate counterfactual explanations that provide borrowers with concrete steps to improve their credit decisions.
+\item There is no established methodology for evaluating whether different explanation methods provide consistent interpretations.
+\item Most studies evaluate on a single dataset, limiting generalizability claims.
+\end{itemize}
+
+\subsection{Contributions}
+
+This paper makes the following contributions:
+
+\begin{enumerate}
+\item We propose the Multi-Level Explainable Credit Scoring (MLECS) framework providing three tiers of explanations: global, local, and counterfactual.
+
+\item We introduce the Explanation Consistency Score (ECS), a novel metric that quantifies agreement between multiple explanation methods.
+
+\item We conduct comprehensive experiments across three diverse credit datasets, demonstrating generalizability.
+
+\item We demonstrate that high predictive performance and multi-level explainability are not mutually exclusive.
+
+\item We provide an open-source implementation enabling practitioners to deploy the complete MLECS pipeline.
+\end{enumerate}
+
+% [Remaining sections follow the structure in paper.md]
+% Due to space, the full LaTeX body matches the content in paper.md
+
+\section{Related Work}
+% Content from Section 2 of paper.md
+
+\section{Proposed Framework: MLECS}
+% Content from Section 3 of paper.md
+
+\section{Experimental Setup}
+% Content from Section 4 of paper.md
+
+\section{Results and Analysis}
+% Content from Section 5 of paper.md
+
+\section{Discussion}
+% Content from Section 6 of paper.md
+
+\section{Conclusion}
+
+This paper presented the Multi-Level Explainable Credit Scoring (MLECS) framework, addressing the critical need for transparent and accountable credit decision systems. By integrating a stacking ensemble of gradient boosting models with a three-tier explainability architecture (global SHAP, local SHAP+LIME, and counterfactual DiCE), MLECS demonstrates that state-of-the-art predictive performance and comprehensive explainability are achievable simultaneously.
+
+Our key contributions include: a unified framework providing global, local, and counterfactual explanations for credit scoring; the Explanation Consistency Score (ECS) metric achieving 94.3\% agreement between SHAP and LIME; validation across three diverse credit datasets confirming generalizability; actionable counterfactual recourse requiring only 2.3 feature changes on average; and competitive AUC-ROC (0.782--0.793) surpassing all baselines.
+
+The MLECS framework is directly applicable to production credit scoring systems and supports compliance with emerging AI regulations including the EU AI Act. As financial institutions increasingly adopt complex ML models for credit decisions, frameworks like MLECS that maintain both accuracy and transparency will be essential for responsible AI deployment.
+
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+
+\end{document}

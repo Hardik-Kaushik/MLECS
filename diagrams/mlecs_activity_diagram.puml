@@ -1,0 +1,91 @@
+@startuml MLECS_Activity_Diagram
+
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 11
+skinparam activityBorderThickness 1.5
+skinparam arrowThickness 2
+skinparam activityBackgroundColor #E3F2FD
+skinparam activityBorderColor #1565C0
+
+title <size:16><b>MLECS System Flow (Activity Diagram)</b></size>\n<size:11>End-to-End Data Processing Pipeline</size>
+
+start
+
+:Load Raw Dataset (CSV)
+-- LendingClub / German Credit / Home Credit;
+
+:Missing Value Detection
+& MICE Iterative Imputation;
+
+:Target Encoding
+with 5-fold Cross-Validation;
+
+:Robust Scaling
+(Median / IQR);
+
+:SMOTE-ENN
+Class Balancing;
+
+:Stratified Train/Test Split
+(80% / 20%);
+
+:Bayesian Hyperparameter Optimization
+(Optuna, 100 trials per model);
+
+fork
+  :Train **XGBoost**
+  depth=5, trees=500
+  L1/L2 regularization;
+fork again
+  :Train **LightGBM**
+  leaves=31, trees=500
+  Leaf-wise growth;
+fork again
+  :Train **CatBoost**
+  depth=6, iter=500
+  Ordered target encoding;
+end fork
+
+:Generate Out-of-Fold
+Predictions (5-Fold CV);
+
+:Train Meta-Learner
+(Logistic Regression)
+P(default|x) = σ(w₁·f_XGB + w₂·f_LGBM + w₃·f_CAT + b);
+
+:Generate Final Predictions
+on Test Set;
+
+fork
+  :TreeSHAP
+  Global Summary
+  (population-level);
+fork again
+  :SHAP Waterfall
+  (per instance)
+  Local explanation;
+fork again
+  :LIME Surrogate
+  (per instance)
+  Dual validation;
+fork again
+  :DiCE Counterfactuals
+  (denied applicants only)
+  Actionable recourse;
+end fork
+
+:Compute ECS
+(SHAP vs LIME agreement)
+α·RankCorr + β·SignAgree + γ·TopK;
+
+:Faithfulness Evaluation
+(Feature Removal Test);
+
+:Generate Explanation Report
+Credit Decision + Multi-Level Explanations;
+
+stop
+
+@enduml

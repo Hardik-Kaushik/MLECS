@@ -1,0 +1,71 @@
+@startuml MLECS_Sequence_Diagram
+
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 11
+skinparam sequenceArrowThickness 2
+skinparam sequenceLifeLineBorderColor #2C3E50
+skinparam sequenceParticipantBackgroundColor #E3F2FD
+skinparam sequenceParticipantBorderColor #1565C0
+skinparam sequenceGroupBackgroundColor #F5F5F5
+
+title <size:16><b>MLECS Sequence Diagram</b></size>\n<size:11>Individual Credit Decision Process</size>
+
+actor "Loan Officer" as LO #BBDEFB
+participant "MLECS\nSystem" as SYS #E3F2FD
+participant "SEP\nModule" as SEP #FFF8E1
+participant "MLE\nModule" as MLE #E8F5E9
+participant "ECS\nModule" as ECS #F3E5F5
+
+== Credit Application Submission ==
+
+LO -> SYS : Submit Credit Application\n(20 features)
+activate SYS
+
+SYS -> SYS : Preprocess Input\n(Encode, Scale)
+
+== Ensemble Prediction ==
+
+SYS -> SEP : Forward preprocessed features
+activate SEP
+
+SEP -> SEP : XGBoost predict → P₁ = 0.42
+SEP -> SEP : LightGBM predict → P₂ = 0.35
+SEP -> SEP : CatBoost predict → P₃ = 0.38
+SEP -> SEP : Meta-Learner combine\nP(default|x) = σ(w₁·P₁ + w₂·P₂ + w₃·P₃ + b)
+
+SEP --> SYS : P(default) = 0.38
+deactivate SEP
+
+== Multi-Level Explanation Generation ==
+
+SYS -> MLE : Generate explanations\n(prediction + model access)
+activate MLE
+
+MLE -> MLE : Level 1: TreeSHAP global values
+MLE -> MLE : Level 2: SHAP waterfall (local)
+MLE -> MLE : Level 2: LIME surrogate (local)
+MLE -> MLE : Level 3: DiCE counterfactuals\n(feasibility constraints applied)
+
+== Consistency Evaluation ==
+
+MLE -> ECS : SHAP values + LIME weights
+activate ECS
+
+ECS -> ECS : Compute Rank Correlation
+ECS -> ECS : Compute Sign Agreement
+ECS -> ECS : Compute Top-K Overlap
+
+ECS --> MLE : ECS = 0.94 (consistent)
+deactivate ECS
+
+MLE --> SYS : Explanation Package\n(SHAP + LIME + Counterfactuals + ECS)
+deactivate MLE
+
+== Decision Delivery ==
+
+SYS --> LO : **Decision:** APPROVED (P=0.38 < 0.5)\n**Top Risk Factors:** checking_status, duration, credit_amount\n**Recourse (if denied):** Reduce utilization, increase savings\n**Consistency:** ECS = 0.94 ✓
+deactivate SYS
+
+@enduml
